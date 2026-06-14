@@ -98,8 +98,51 @@ function updateBoids() {
       ticket.lockTimer--;
       if (ticket.lockTimer <= 0) {
         // Complete ticket simulation
-        ticket.status = "OPEN";
+        ticket.status = "COMPLETED"; // Change to COMPLETED instead of recycling immediately
         const winner = state.agents.find(a => a.id === ticket.lockedBy);
+        
+        // Output result log in the sidebar live logs
+        const logContainer = document.getElementById("live-ticket-logs");
+        if (logContainer) {
+          // Clear default placeholder if present
+          if (logContainer.innerHTML.includes("チケットが処理されると")) {
+            logContainer.innerHTML = "";
+          }
+          
+          let resultHtml = `
+            <div style="margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+              <span style="color: #10b981; font-weight: bold;">[${ticket.id} COMPLETED]</span> Assigned to: <strong>${winner ? winner.name : 'Unknown Agent'}</strong><br/>
+              <span style="color: #67e8f9; font-weight: bold;">Requirement:</span> ${ticket.title}<br/>
+          `;
+
+          if (ticket.title.includes("資産を1000万")) {
+            resultHtml += `
+              <span style="color: #fbbf24; font-weight: bold;">[Gemini Financial Strategist Output]:</span><br/>
+              <div style="background: rgba(0,0,0,0.5); padding: 6px; border-radius: 4px; color: #fff; margin-top: 4px; white-space: pre-wrap; font-size: 10px;">
+10年で1000万円増やす現実的戦略:
+1. 月利5.0%想定で「月6.5万円」積立投資。
+2. NISA(オール・カントリー80%, S&P500 20%)を軸に。
+3. 自己投資(年12万)で昇給・副業スキル獲得。
+4. 生活防衛資金(約150万)は現金で確保。
+※成果物は projects/PRJ-ASSET/deliverables/asset_strategy.md に改ざん不能(chmod 444)として保存されました。
+              </div>
+            `;
+          } else {
+            resultHtml += `
+              <span style="color: #fbbf24; font-weight: bold;">[Agent Code Output]:</span><br/>
+              <div style="background: rgba(0,0,0,0.5); padding: 6px; border-radius: 4px; color: #10b981; margin-top: 4px; white-space: pre-wrap; font-size: 10px;">
+class ClearanceCalculator:
+    def __init__(self, delta_moisture=4.0):
+        self.expansion_factor = 0.0035 # Maple wood
+        self.delta_moisture = delta_moisture
+...
+              </div>
+            `;
+          }
+          resultHtml += `</div>`;
+          logContainer.innerHTML = resultHtml + logContainer.innerHTML;
+        }
+
         if (winner) {
           winner.smile += ticket.id === "FG-01" ? 250 : 180;
           winner.experience += 40;
@@ -112,11 +155,8 @@ function updateBoids() {
           }
         }
         
-        // Randomly relocate the ticket to simulate new ticket ingestion
-        ticket.x = Math.random() * (width - 200) + 100;
-        ticket.y = Math.random() * (height - 150) + 100;
-        ticket.status = "OPEN";
-        ticket.lockedBy = null;
+        // Remove ticket from list or mark as done instead of random recycling
+        state.tickets = state.tickets.filter(t => t.id !== ticket.id);
       }
     }
   });
