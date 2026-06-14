@@ -1,0 +1,20 @@
+{
+  "$schema": "https://forest-gram.ts.net/schemas/skill-schema.json",
+  "skill_id": "write_file",
+  "name": "ファイル書き込みツール",
+  "description": "セキュリティ境界（forest-gram-workspace/projects/）内へ安全に成果物または仕掛品を書き出します。ワークスペース外部への書き込みや木化された不変アセットへの書き込みは自動的にブロックされます。",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "file_path": {
+        "type": "string",
+        "description": "書き込み先ファイルの絶対パス、または projects/{project_id}/ 以下の相対パス"
+      },
+      "content": {
+        "type": "string",
+        "description": "ファイルに書き込むテキストコンテンツ"
+      }
+    },
+    "required": ["file_path", "content"]
+  }
+}

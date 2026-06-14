@@ -1,0 +1,16 @@
+{
+  "$schema": "https://forest-gram.ts.net/schemas/skill-schema.json",
+  "skill_id": "read_file",
+  "name": "ファイル読み込みツール",
+  "description": "セキュリティ境界（forest-gram-workspace）内にあるファイルを安全に読み取ります。パスの走査（Path Traversal）は自動的に拒否されます。",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "file_path": {
+        "type": "string",
+        "description": "読み取る対象ファイルの絶対パス、または projects/{project_id}/ 以下の相対パス"
+      }
+    },
+    "required": ["file_path"]
+  }
+}
