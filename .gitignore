@@ -1,0 +1,52 @@
+# === Secrets / Environment ===
+.env
+*.key
+*.pem
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+
+# === Database (ローカルのみ / 本番はマイグレーションで管理) ===
+forest_guild.db
+*.db-shm
+*.db-wal
+
+# === 成果物・一時ファイル (生成物は除外) ===
+projects/PRJ-ASSET/temporary/
+projects/PRJ-ASSET/deliverables/
+
+# === Node.js / Frontend ===
+node_modules/
+frontend/node_modules/
+.npm
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === Logs ===
+*.log
+logs/
+
+# === その他 ===
+hacked.txt
