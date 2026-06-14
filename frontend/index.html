@@ -3,223 +3,316 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Forest-gram 🌳 自律循環型エージェント生態系</title>
-    <!-- Google Fonts for Modern Premium Typography -->
+    <meta name="description" content="Forest-gram — 自律循環型マルチエージェント生態系ビジュアライゼーション。SUN・Tree・Fungiエージェントがリアルタイムで協調動作します。" />
+    <title>Forest-gram — 自律循環型エージェント生態系</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
   </head>
   <body>
     <div id="app">
-      <!-- Background Aurora Gradients -->
-      <div class="aurora-bg"></div>
 
-      <!-- Main Container -->
-      <main class="dashboard-container">
-        <!-- Sidebar Controls -->
-        <aside class="sidebar-panel glassmorphic">
-          <div class="sidebar-header">
-            <span class="logo-icon">🌳</span>
-            <h1>Forest-gram</h1>
+      <!-- Aurora Background -->
+      <div class="aurora-bg" aria-hidden="true"></div>
+
+      <!-- ── Mobile/Desktop Header ── -->
+      <header class="mobile-header">
+        <div class="header-brand">
+          <div class="brand-icon" aria-hidden="true">
+            <!-- Tree SVG icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L6 9h3.5L5 16h5v6h4v-6h5l-4.5-7H18L12 2z"/>
+            </svg>
           </div>
-          
-          <div class="gardener-status">
-            <div class="status-row">
-              <span>庭師: <strong>Gardener#01</strong></span>
-              <span class="badge">Active</span>
-            </div>
-            <div class="smile-display">
-              <span class="smile-label">保有エネルギー</span>
-              <span class="smile-value">1,250 ☺</span>
-            </div>
+          <span class="brand-name">Forest-gram</span>
+        </div>
+
+        <div class="header-right">
+          <!-- Gardener energy chip -->
+          <div class="gardener-chip" aria-label="保有エネルギー">
+            <span style="font-size:0.7rem; color:var(--text-disabled)">庭師</span>
+            <span class="chip-smile" id="header-smile-val">1,250 ☺</span>
           </div>
 
-          <!-- Climate Controls -->
-          <section class="control-section">
-            <h2>🌧️ 天候・環境操作 (Direct Intervention)</h2>
-            <div class="button-grid">
-              <button id="btn-rain" class="action-btn rain-btn">
-                <span class="icon">🌧️</span>
-                <span class="label">慈雨のバフ (100☺)</span>
-              </button>
-              <button id="btn-pesticide" class="action-btn pesticide-btn">
-                <span class="icon">🧪</span>
-                <span class="label">農薬駆除 (150☺)</span>
-              </button>
-            </div>
-          </section>
+          <!-- Weather badge (desktop also shows here) -->
+          <div class="weather-badge" id="weather-status" role="status">
+            <span class="weather-dot" aria-hidden="true"></span>
+            <span id="weather-label">Normal</span>
+          </div>
 
-          <!-- Task/Ticket Simulation Control -->
-          <section class="control-section">
-            <h2>🎟️ クエストインジェクション</h2>
-            <div class="form-group">
-              <label for="ticket-title">新規チケット要件</label>
-              <input type="text" id="ticket-title" placeholder="例: 湿度対応クリアランス設計" value="湿度15%対応のメープル板材の変形計算とクリアランス設計" />
-            </div>
-            <div class="form-group">
-              <label for="ticket-tags">タグ (カンマ区切り)</label>
-              <input type="text" id="ticket-tags" value="Python, Calculator, Wood-properties" />
-            </div>
-            <button id="btn-add-ticket" class="primary-btn">
-              <span>🚀 チケットを Board へ投下</span>
-            </button>
-          </section>
+          <!-- Hamburger: opens sidebar on mobile -->
+          <button class="btn-menu-toggle" id="btn-menu-toggle" aria-label="コントロールパネルを開く" aria-expanded="false" aria-controls="sidebar-panel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="3" y1="6"  x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </header>
 
-          <!-- Live Agent Outputs -->
-          <section class="control-section">
-            <h2>📝 エージェント実行ログ・生成成果物</h2>
-            <div id="live-ticket-logs" class="live-logs-container glassmorphic" style="max-height: 250px; overflow-y: auto; padding: 10px; font-size: 11px; font-family: monospace; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-              <div style="color: var(--text-muted);">チケットが処理されると、ここに生成された成果物や実行結果が出力されます。</div>
+      <!-- ── Dashboard Body ── -->
+      <div class="dashboard-body">
+
+        <!-- Sidebar overlay (mobile only) -->
+        <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+        <!-- ── Sidebar Panel ── -->
+        <aside class="sidebar-panel" id="sidebar-panel" role="complementary" aria-label="コントロールパネル">
+          <div class="sidebar-inner">
+
+            <!-- Gardener Status -->
+            <div class="gardener-card">
+              <div class="gardener-row">
+                <span class="gardener-name">庭師: <strong>Gardener#01</strong></span>
+                <span class="status-badge">Active</span>
+              </div>
+              <div class="energy-display">
+                <span class="energy-label">保有エネルギー</span>
+                <span class="energy-value" id="sidebar-smile-val">1,250<span class="energy-unit"> ☺</span></span>
+              </div>
             </div>
-          </section>
+
+            <!-- Climate Controls -->
+            <div class="gap-2">
+              <span class="section-label">天候・環境操作</span>
+              <div class="btn-grid">
+                <button id="btn-rain" class="ctrl-btn rain" type="button">
+                  <span class="ctrl-btn-icon">🌧️</span>
+                  <span class="ctrl-btn-label">慈雨のバフ</span>
+                  <span class="ctrl-btn-cost">100 ☺ 消費</span>
+                </button>
+                <button id="btn-pesticide" class="ctrl-btn pesticide" type="button">
+                  <span class="ctrl-btn-icon">🧪</span>
+                  <span class="ctrl-btn-label">農薬駆除</span>
+                  <span class="ctrl-btn-cost">150 ☺ 消費</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Quest Injection -->
+            <div class="gap-3">
+              <span class="section-label">クエストインジェクション</span>
+              <div class="form-field">
+                <label class="form-label" for="ticket-title">要件</label>
+                <textarea
+                  id="ticket-title"
+                  class="form-input"
+                  rows="3"
+                  placeholder="例: 湿度対応クリアランス設計">湿度15%対応のメープル板材の変形計算とクリアランス設計</textarea>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ticket-tags">タグ</label>
+                <input
+                  type="text"
+                  id="ticket-tags"
+                  class="form-input tags"
+                  value="Python, Calculator, Wood-properties"
+                  placeholder="Python, Calculator, ..." />
+                <span class="tags-hint">カンマ区切りで入力</span>
+              </div>
+              <button id="btn-add-ticket" class="primary-btn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="16"/>
+                  <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+                Board へ投下
+              </button>
+            </div>
+
+            <!-- Live Logs -->
+            <div class="gap-2">
+              <span class="section-label">エージェント実行ログ</span>
+              <div id="live-ticket-logs" class="live-logs" role="log" aria-live="polite" aria-label="エージェント実行ログ">
+                <span class="log-placeholder">チケットが処理されると、ここに生成された成果物や実行結果が出力されます。</span>
+              </div>
+            </div>
+
+          </div>
         </aside>
 
-        <!-- Main Guild Canvas Viewport -->
-        <section class="canvas-viewport glassmorphic">
-          <div class="viewport-header">
-            <div class="view-title">
-              <h2>Ecosystem Canvas (#quest-board)</h2>
-              <p class="subtitle">Boids物理スワーム・自律 Pull シミュレーション (60FPS WebGL Canvas)</p>
-            </div>
-            <div class="weather-badge" id="weather-status">晴れ (Normal)</div>
+        <!-- ── Main Canvas ── -->
+        <section class="canvas-viewport" aria-label="エコシステムキャンバス">
+          <div class="viewport-topbar" aria-hidden="true">
+            <!-- Intentionally empty on mobile; weather badge is in header -->
           </div>
 
-          <!-- The Interactive Boids Canvas -->
           <div class="canvas-wrapper" id="canvas-container">
-            <canvas id="boids-canvas"></canvas>
-            
-            <!-- Zoom & Drag Guide -->
-            <div class="interaction-guide">
-              <span>🖱️ ドラッグでカメラ移動 | 🔄 ホイールでズームイン/アウト</span>
+            <canvas id="boids-canvas" aria-label="Boidsスワームエコシステム" role="img"></canvas>
+            <div class="canvas-hint" aria-hidden="true">
+              ドラッグ: カメラ移動 &nbsp;|&nbsp; ホイール/ピンチ: ズーム &nbsp;|&nbsp; タップ: エージェント選択
             </div>
           </div>
         </section>
 
-        <!-- Pixelation Tool Sandbox -->
-        <aside class="pixel-sandbox glassmorphic">
-          <h2>👾 8bitアバターピクセレーション砂場</h2>
-          <p class="info-text">高解像度イラストを16色の木工パレットドット絵アバターに自動リアルタイム変換します。</p>
+      </div><!-- /.dashboard-body -->
 
-          <div class="pixel-sandbox-grid">
-            <div class="sandbox-input">
-              <div class="upload-area" id="upload-zone">
-                <span class="upload-icon">📸</span>
-                <span class="upload-text">画像をアップロードするかドロップ</span>
-                <input type="file" id="avatar-uploader" accept="image/*" style="display: none;" />
-              </div>
-              <div class="presets-container">
-                <span class="presets-label">プリセット:</span>
-                <div class="preset-buttons">
-                  <button class="preset-btn" data-preset="willow">柳の木</button>
-                  <button class="preset-btn" data-preset="maple">楓の葉</button>
-                  <button class="preset-btn" data-preset="oak">オーク幹</button>
-                </div>
-              </div>
+      <!-- ── FAB: Pixel Sandbox ── -->
+      <div class="fab-container" aria-label="ピクセルサンドボックス">
+        <span class="fab-label">8bit アバター変換</span>
+        <button class="fab-btn" id="btn-open-sandbox" type="button" aria-label="ピクセルサンドボックスを開く">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="8" height="8" rx="1"/>
+            <rect x="13" y="3" width="8" height="8" rx="1"/>
+            <rect x="3" y="13" width="8" height="8" rx="1"/>
+            <rect x="13" y="13" width="8" height="8" rx="1"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- ── Modal: Pixel Sandbox ── -->
+      <div class="modal-overlay" id="sandbox-modal" role="dialog" aria-modal="true" aria-label="8bitアバターピクセレーション">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h2 class="modal-title">8bit アバターピクセレーション</h2>
+            <button class="modal-close" id="btn-close-sandbox" type="button" aria-label="閉じる">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p class="sandbox-desc">高解像度イラストを16色の木工パレットドット絵アバターにリアルタイム変換します。</p>
+
+            <!-- Upload -->
+            <div class="upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="画像をアップロード">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span class="upload-text">画像をドロップ、またはクリックして選択</span>
+              <span class="upload-sub">PNG / JPG / WEBP 対応</span>
+              <input type="file" id="avatar-uploader" accept="image/*" class="visually-hidden" tabindex="-1"/>
             </div>
 
+            <!-- Presets -->
+            <div class="presets-row">
+              <span class="presets-row-label">プリセット:</span>
+              <button class="preset-btn" data-preset="willow" type="button">柳の木</button>
+              <button class="preset-btn" data-preset="maple" type="button">楓の葉</button>
+              <button class="preset-btn" data-preset="oak" type="button">オーク幹</button>
+            </div>
+
+            <!-- Canvas Outputs -->
             <div class="sandbox-outputs">
               <div class="canvas-item">
-                <span>Step 1: 元画像 (透過処理後)</span>
-                <canvas id="canvas-original" width="128" height="128"></canvas>
+                <span class="canvas-item-label">元画像（透過処理後）</span>
+                <canvas id="canvas-original" width="160" height="160"></canvas>
               </div>
               <div class="canvas-item">
-                <span>Step 4: 8bit ドットアバター (輪郭・パレット制限後)</span>
-                <canvas id="canvas-pixelated" width="128" height="128"></canvas>
+                <span class="canvas-item-label">8bit ドットアバター</span>
+                <canvas id="canvas-pixelated" width="160" height="160"></canvas>
               </div>
             </div>
-          </div>
 
-          <div class="sandbox-controls">
+            <!-- Controls -->
             <div class="range-group">
-              <label for="pixel-size">ドット粗さ (ピクセルグリッドサイズ): <span id="val-pixel-size">2</span></label>
+              <label class="range-label" for="pixel-size">
+                ドット粗さ
+                <span class="range-val" id="val-pixel-size">2</span>
+              </label>
               <input type="range" id="pixel-size" min="1" max="4" value="2" />
             </div>
             <div class="range-group">
-              <label for="chroma-threshold">透過背景許容値 (Chroma Key): <span id="val-chroma-threshold">20</span></label>
+              <label class="range-label" for="chroma-threshold">
+                透過背景許容値
+                <span class="range-val" id="val-chroma-threshold">20</span>
+              </label>
               <input type="range" id="chroma-threshold" min="5" max="50" value="20" />
             </div>
-          </div>
-        </aside>
-      </main>
 
-      <!-- Bottom Sheet: Tap to view Agent Details -->
-      <div id="bottom-sheet" class="bottom-sheet glassmorphic">
-        <div class="sheet-drag-handle"></div>
-        <div class="sheet-content">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Bottom Sheet: Agent Detail ── -->
+      <div id="bottom-sheet" class="bottom-sheet" role="dialog" aria-modal="true" aria-label="エージェント詳細">
+        <div class="sheet-handle-wrap" aria-hidden="true">
+          <div class="sheet-handle"></div>
+        </div>
+        <div class="sheet-inner">
           <div class="sheet-header">
-            <div class="sheet-agent-avatar" id="sheet-avatar-slot">🌳</div>
-            <div class="sheet-agent-title">
-              <h3 id="sheet-agent-name">willow</h3>
-              <p id="sheet-agent-level">Level 4 (Hardwood)</p>
+            <div class="sheet-avatar" id="sheet-avatar-slot" aria-hidden="true">🌳</div>
+            <div class="sheet-agent-info">
+              <h3 class="sheet-agent-name" id="sheet-agent-name">willow</h3>
+              <p class="sheet-agent-level" id="sheet-agent-level">Level 4 · SOFTWOOD</p>
             </div>
-            <button id="sheet-close-btn" class="close-btn">&times;</button>
+            <button class="sheet-close" id="sheet-close-btn" type="button" aria-label="閉じる">&times;</button>
           </div>
 
-          <div class="sheet-body">
-            <!-- 5 Core Parameters Radar/Bar -->
-            <div class="parameters-section">
-              <h4>🧬 5大能力遺伝パラメータ</h4>
-              <div class="param-bars">
-                <div class="param-bar-row">
-                  <span>精度 (Precision)</span>
-                  <div class="bar-bg"><div id="bar-precision" class="bar-fill" style="width: 80%;"></div></div>
-                  <span id="val-precision">80</span>
+          <div class="sheet-body-grid">
+            <!-- Parameters -->
+            <div>
+              <p class="section-title">🧬 5大能力パラメータ</p>
+              <div class="param-list">
+                <div class="param-row">
+                  <span class="param-name">精度</span>
+                  <div class="bar-track"><div id="bar-precision" class="bar-fill" style="width:80%"></div></div>
+                  <span class="param-val" id="val-precision">80</span>
                 </div>
-                <div class="param-bar-row">
-                  <span>速度 (Velocity)</span>
-                  <div class="bar-bg"><div id="bar-velocity" class="bar-fill" style="width: 70%;"></div></div>
-                  <span id="val-velocity">70</span>
+                <div class="param-row">
+                  <span class="param-name">速度</span>
+                  <div class="bar-track"><div id="bar-velocity" class="bar-fill" style="width:70%"></div></div>
+                  <span class="param-val" id="val-velocity">70</span>
                 </div>
-                <div class="param-bar-row">
-                  <span>効率 (Efficiency)</span>
-                  <div class="bar-bg"><div id="bar-efficiency" class="bar-fill" style="width: 90%;"></div></div>
-                  <span id="val-efficiency">90</span>
+                <div class="param-row">
+                  <span class="param-name">効率</span>
+                  <div class="bar-track"><div id="bar-efficiency" class="bar-fill" style="width:90%"></div></div>
+                  <span class="param-val" id="val-efficiency">90</span>
                 </div>
-                <div class="param-bar-row">
-                  <span>調和 (Harmony)</span>
-                  <div class="bar-bg"><div id="bar-harmony" class="bar-fill" style="width: 60%;"></div></div>
-                  <span id="val-harmony">60</span>
+                <div class="param-row">
+                  <span class="param-name">調和</span>
+                  <div class="bar-track"><div id="bar-harmony" class="bar-fill" style="width:60%"></div></div>
+                  <span class="param-val" id="val-harmony">60</span>
                 </div>
-                <div class="param-bar-row">
-                  <span>反省 (Resilience)</span>
-                  <div class="bar-bg"><div id="bar-resilience" class="bar-fill" style="width: 80%;"></div></div>
-                  <span id="val-resilience">80</span>
+                <div class="param-row">
+                  <span class="param-name">反省</span>
+                  <div class="bar-track"><div id="bar-resilience" class="bar-fill" style="width:80%"></div></div>
+                  <span class="param-val" id="val-resilience">80</span>
                 </div>
               </div>
             </div>
 
-            <!-- Wallet & Memory -->
-            <div class="memory-section">
-              <div class="meta-card">
-                <span>smile残高</span>
-                <strong id="sheet-agent-wallet">450 ☺</strong>
+            <!-- Meta + Memory -->
+            <div>
+              <p class="section-title">資産・記憶</p>
+              <div class="meta-grid">
+                <div class="meta-card">
+                  <div class="meta-card-label">smile 残高</div>
+                  <div class="meta-card-value" id="sheet-agent-wallet">450 ☺</div>
+                </div>
+                <div class="meta-card">
+                  <div class="meta-card-label">信頼度</div>
+                  <div class="meta-card-value" id="sheet-agent-trust">98%</div>
+                </div>
               </div>
-              <div class="meta-card">
-                <span>信頼度 (Trust Score)</span>
-                <strong id="sheet-agent-trust">98%</strong>
-              </div>
-              <div class="episodic-card">
-                <span>🧠 短期エピソード記憶 (最後のエラーと反省)</span>
-                <p id="sheet-agent-memory">"DXFファイルの座標出力時にゼロ除算エラーが発生したため、安全ガード節を追加。次回以降、分子・分母の検証ロジックを必ず適用する。"</p>
+              <div class="memory-card">
+                <div class="memory-card-label">🧠 短期エピソード記憶</div>
+                <p class="memory-card-text" id="sheet-agent-memory">
+                  "DXFファイルの座標出力時にゼロ除算エラーが発生したため、安全ガード節を追加。次回以降、分子・分母の検証ロジックを必ず適用する。"
+                </p>
               </div>
             </div>
           </div>
+
         </div>
       </div>
 
-      <!-- Level Up Fanfare Overlay -->
-      <div id="fanfare-overlay" class="fanfare-overlay">
-        <div class="fanfare-card glassmorphic">
-          <div class="fanfare-sparks">✨🎊✨</div>
-          <h2 class="gold-gradient">LEVEL UP !!</h2>
-          <div class="fanfare-avatar">🌳</div>
-          <h3 id="fanfare-agent-name">willow</h3>
-          <p id="fanfare-level-change">Level 4 ➡️ Level 5</p>
-          <button id="fanfare-close-btn" class="primary-btn"><span>讃える 👍</span></button>
+      <!-- ── Fanfare Level Up ── -->
+      <div id="fanfare-overlay" class="fanfare-overlay" role="alertdialog" aria-modal="true" aria-label="レベルアップ">
+        <div class="fanfare-card">
+          <div class="fanfare-sparks" aria-hidden="true">✨ 🎊 ✨</div>
+          <h2 class="fanfare-title">LEVEL UP !!</h2>
+          <div class="fanfare-avatar" id="fanfare-avatar" aria-hidden="true">🌳</div>
+          <p class="fanfare-agent-name" id="fanfare-agent-name">willow</p>
+          <p class="fanfare-level-change" id="fanfare-level-change">Level 4 ➡️ Level 5</p>
+          <button id="fanfare-close-btn" class="primary-btn" type="button" style="max-width:200px; margin-top:8px;">
+            讃える 👍
+          </button>
         </div>
       </div>
 
-    </div>
+    </div><!-- /#app -->
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
