@@ -32,19 +32,28 @@ class LocalLLMClient:
         response = requests.post(self.api_url, json=payload, timeout=180.0)
         response.raise_for_status()
         
-        # レスポンス形式をパースして結果のテキストを返す
-        # LM Studio / Ollama / OpenAI互換API の各形式に対応
+        # LM Studio 独自形式: {"output": [{"type": "reasoning", ...}, {"type": "message", "content": "..."}]}
         try:
             data = response.json()
-            if "response" in data:
-                return data["response"]
-            elif "content" in data:
-                return data["content"]
+            # LM Studio 形式: output配列から type="message" のcontentを取得
+            if "output" in data and isinstance(data["output"], list):
+                for item in data["output"]:
+                    if item.get("type") == "message":
+                        return item.get("content", "")
+                # "message" がなければ最後の要素のcontent
+                if data["output"]:
+                    return data["output"][-1].get("content", "")
+            # OpenAI互換形式
             elif "choices" in data and len(data["choices"]) > 0:
                 choice = data["choices"][0]
                 if "message" in choice:
                     return choice["message"].get("content", "")
                 return choice.get("text", "")
+            # シンプルな形式
+            elif "response" in data:
+                return data["response"]
+            elif "content" in data:
+                return data["content"]
             return json.dumps(data)
         except (ValueError, KeyError, TypeError):
             return response.text
